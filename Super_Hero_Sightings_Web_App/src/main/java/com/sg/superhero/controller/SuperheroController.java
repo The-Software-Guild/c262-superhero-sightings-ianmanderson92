@@ -17,11 +17,17 @@ import com.sg.superhero.service.SuperheroServiceLayer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolation;
+import javax.validation.Valid;
+import javax.validation.Validation;
+import javax.validation.Validator;
 import java.util.List;
+import java.util.Set;
 
 @Controller
 public class SuperheroController
@@ -33,8 +39,10 @@ public class SuperheroController
     @Autowired
     RESTController restController;
 
+    Validator validate = Validation.buildDefaultValidatorFactory().getValidator();
+
     @GetMapping( "superheros" )
-    public String displaySuperheros( Model model )
+    public String displaySuperheros( Model model, BindingResult result )
     {
         List<Superhero> superheroList = serviceLayer.getAllSuperheros();
         model.addAttribute( "superheros", superheroList );
@@ -42,13 +50,18 @@ public class SuperheroController
     }
 
     @PostMapping( "addSuperhero" )
-    public String addSuperhero( HttpServletRequest request )
+    public String addSuperhero( HttpServletRequest request, BindingResult result )  //public String addSuperhero( HttpServletRequest request )
     {
         String name = request.getParameter( "name" );
         String description = request.getParameter( "description" );
         String superpower = request.getParameter( "superpower" );
 
-        Superhero newSuperhero = new Superhero( name, description, superpower );
+        @Valid Superhero newSuperhero = new Superhero( name, description, superpower );
+        Set<ConstraintViolation<Superhero>> errors = validate.validate( newSuperhero );
+        if( result.hasErrors() )
+        {
+            return "superheros";
+        }
         serviceLayer.addSuperhero( newSuperhero );
 
         return "redirect:/superheros";

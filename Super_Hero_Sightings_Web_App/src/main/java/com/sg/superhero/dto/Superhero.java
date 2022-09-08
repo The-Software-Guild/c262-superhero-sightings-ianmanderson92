@@ -14,6 +14,10 @@ package com.sg.superhero.dto;
 
 import com.sg.superhero.dao.InputValidationException;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+import javax.validation.Validation;
+import javax.validation.Validator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -21,11 +25,25 @@ import java.util.Objects;
 public class Superhero
 {
 
-    //Primary Key
-    private  int id;
+    //Database Validation Constants
+    private final int NAME_MAX_LENGTH = 30;
+    private final int DESCRIPTION_MAX_LENGTH = 450;
+    private final int SUPERPOWER_MAX_LENGTH = 450;
 
+    //Primary Key
+    private int id;
+
+    @NotBlank ( message = "Name field is required." )
+    @Size ( max = NAME_MAX_LENGTH, message = "Name entry is too long. Max Length: "
+        + NAME_MAX_LENGTH )
     private String name;
+
+    @Size ( max = DESCRIPTION_MAX_LENGTH, message = "Description entry is too long. Max Length: "
+        + DESCRIPTION_MAX_LENGTH )
     private String description;
+
+    @Size ( max = SUPERPOWER_MAX_LENGTH, message = "Super Power entry is too long. Max Length: "
+        + SUPERPOWER_MAX_LENGTH )
     private String superpower;
 
     //Optional Data members
@@ -33,6 +51,7 @@ public class Superhero
     private List<Organization> memberOrganizations;
 
     //TODO: Add Bridge Table for SuperPowers and SuperPowers Page.
+
 
     public Superhero()
     {
@@ -145,18 +164,18 @@ public class Superhero
         {
             errorMessages.add( "Name is required." );
         }
-        if ( this.name.length() > 30 )
+        if ( this.name.length() > NAME_MAX_LENGTH )
         {
             errorMessages.add( "Input Name is too long." );
         }
 
         //Description
-        if ( this.description.length() > 450 )
+        if ( this.description.length() > DESCRIPTION_MAX_LENGTH )
         {
             errorMessages.add( "Input Description is too long." );
         }
 
-        if ( this.superpower.length() > 450 )
+        if ( this.superpower.length() > SUPERPOWER_MAX_LENGTH )
         {
             errorMessages.add( "Input Superpower is too long." );
         }
@@ -175,19 +194,18 @@ public class Superhero
     //Helper methods for validation function
 
     /**
-     Method code adapted from:
-     Author: Hirondelle Systems
-     http://www.javapractices.com/topic/TopicAction.do?Id=209#:~:text=In%20the%20Java%20programming%20language,the%20user%20about%20the%20issues
-
-     * @param field object to be checked
-     * @param errorMsg error message to throw
-     * @param errors error message array to append
-     * @return true is null
+     Method code adapted from: Author: Hirondelle Systems
+     http://www.javapractices.com/topic/TopicAction.do?Id=209#:~:text=In%20the%20Java%20programming%20language,
+     the%20user%20about%20the%20issues
+     @param field    object to be checked
+     @param errorMsg error message to throw
+     @param errors   error message array to append
+     @return true is null
      */
     private boolean ensureNotNull( Object field, String errorMsg, List<String> errors )
     {
         boolean result = true;
-        if (field == null)
+        if ( field == null )
         {
             errors.add( errorMsg );
             result = false;
@@ -196,16 +214,14 @@ public class Superhero
     }
 
     /**
-     Method code adapted from:
-     Author: Hirondelle Systems
-     http://www.javapractices.com/topic/TopicAction.do?Id=209#:~:text=In%20the%20Java%20programming%20language,the%20user%20about%20the%20issues
-
-     * @param stringToCheck String to validate
-     * @return true if not null or empty
+     Method code adapted from: Author: Hirondelle Systems
+     http://www.javapractices.com/topic/TopicAction.do?Id=209#:~:text=In%20the%20Java%20programming%20language,
+     the%20user%20about%20the%20issues
+     @param stringToCheck String to validate
+     @return true if not null or empty
      */
     private boolean hasContent( String stringToCheck )
     {
         return ( stringToCheck != null && stringToCheck.trim().length() > 0 );
     }
-
 }//End of Superhero
